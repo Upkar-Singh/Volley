@@ -44,7 +44,7 @@ public class NetworkUtils {
         // finally block.
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
-        String bookJSONString = null;
+        String bookJSONString = "";
 
         try {
             // Build the full query URI, limiting results to 10 items and

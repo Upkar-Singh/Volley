@@ -214,14 +214,12 @@ public class MainActivity extends AppCompatActivity
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("TheJsonString", "hello");
-
                         try {
-                            Log.d("The", "Yellow");
 //                            Log.d("TheJsonString2", response.getJSONArray("imageLinks").getString(0).toString());
 //                            Log.d("TheJsonString2", response.getJSONArray("items").getJSONObject(0).getJSONObject("imageLinks").toString());
                             Log.d("TheJsonString2", response.getJSONArray("items").getJSONObject(0).getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("smallThumbnail"));
-                            mChangeImgButon.s
+                            String url = response.getJSONArray("items").getJSONObject(0).getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("smallThumbnail");
+                            Picasso.get().load(url).into(mImage);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
