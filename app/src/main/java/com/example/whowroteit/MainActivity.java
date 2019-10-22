@@ -3,20 +3,34 @@ package com.example.whowroteit;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.net.URI;
 
 /**
  * The WhoWroteIt app queries the Book Search API for books based
@@ -26,9 +40,24 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<String> {
 
+
+    // Constants for the various components of the Books API request.
+    //
+    // Base endpoint URL for the Books API.
+    private static final String BOOK_BASE_URL =
+            "https://www.googleapis.com/books/v1/volumes?";
+    // Parameter for the search string.
+    private static final String QUERY_PARAM = "q";
+    // Parameter that limits search results.
+    private static final String MAX_RESULTS = "maxResults";
+    // Parameter to filter by print type.
+    private static final String PRINT_TYPE = "printType";
+
     private EditText mBookInput;
     private TextView mTitleText;
     private TextView mAuthorText;
+    private ImageView mImage;
+    private Button mChangeImgButon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +67,8 @@ public class MainActivity extends AppCompatActivity
         mBookInput = findViewById(R.id.bookInput);
         mTitleText = findViewById(R.id.titleText);
         mAuthorText = findViewById(R.id.authorText);
+        mImage = findViewById(R.id.imageView);
+        mChangeImgButon = findViewById(R.id.button);
 
         if (getSupportLoaderManager().getLoader(0) != null) {
             getSupportLoaderManager().initLoader(0, null, this);
@@ -165,5 +196,50 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoaderReset(@NonNull Loader<String> loader) {
         // Do nothing.  Required by interface.
+    }
+
+
+    public void displayImage(View view) {
+        String queryString = mBookInput.getText().toString();
+
+        Uri builtURI = Uri.parse(BOOK_BASE_URL).buildUpon()
+                .appendQueryParameter(QUERY_PARAM, queryString)
+                .appendQueryParameter(MAX_RESULTS, "10")
+                .appendQueryParameter(PRINT_TYPE, "books")
+                .build();
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, builtURI.toString(),null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("TheJsonString", "hello");
+
+                        try {
+                            Log.d("The", "Yellow");
+//                            Log.d("TheJsonString2", response.getJSONArray("imageLinks").getString(0).toString());
+//                            Log.d("TheJsonString2", response.getJSONArray("items").getJSONObject(0).getJSONObject("imageLinks").toString());
+                            Log.d("TheJsonString2", response.getJSONArray("items").getJSONObject(0).getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("smallThumbnail"));
+                            mChangeImgButon.s
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+//                            Log.d("TheJson", response.getJSONArray("imageLinks").getString(0));
+//                            Picasso.get().load(response.getString("imageLinks")).into(mImage);
+
+                            Log.d("The value", "hi");
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO: Handle error
+
+                    }
+                });
+        queue.add(jsonObjectRequest);
     }
 }
